@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chess Game Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/css/chessboard.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/js/chessboard.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 30px;
+    }
+    #board {
+      width: 400px;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+
+<h1>♟️ Chess Game Demo</h1>
+<p>Mode: 2-Player (Pass & Play)</p>
+
+<div id="board"></div>
+<p id="status"></p>
+<button onclick="restart()">🔁 Restart</button>
+
+<script>
+  const board = Chessboard('board', {
+    draggable: true,
+    position: 'start',
+    onDrop: handleMove
+  });
+
+  const game = new Chess();
+
+  function handleMove(source, target) {
+    const move = game.move({
+      from: source,
+      to: target,
+      promotion: 'q' // Always promote to queen
+    });
+
+    if (move === null) return 'snapback';
+
+    updateStatus();
+
+    // Optional: Auto-flip board after move
+    // board.flip();
+  }
+
+  function updateStatus() {
+    let status = '';
+
+    if (game.in_checkmate()) {
+      status = '🏁 Checkmate! ' + (game.turn() === 'w' ? 'Black' : 'White') + ' wins!';
+    } else if (game.in_draw()) {
+      status = '🤝 Draw!';
+    } else {
+      status = 'Turn: ' + (game.turn() === 'w' ? 'White' : 'Black');
+      if (game.in_check()) {
+        status += ' (Check!)';
+      }
+    }
+
+    $('#status').text(status);
+  }
+
+  function restart() {
+    game.reset();
+    board.start();
+    updateStatus();
+  }
+
+  updateStatus();
+</script>
+
+</body>
+</html>
